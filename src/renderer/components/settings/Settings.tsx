@@ -137,7 +137,11 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             key: "splashProgress",
             title: "Show progress bar in Splash",
             description: "Adds a fancy progress bar to the splash window",
+<<<<<<< HEAD
             defaultValue: true
+=======
+            defaultValue: false
+>>>>>>> upstream/main
         }
     ],
     "Custom Splash Animation": [CustomSplashAnimation],
