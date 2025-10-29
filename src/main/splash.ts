@@ -7,10 +7,13 @@
 import { BrowserWindow } from "electron";
 import { join } from "path";
 import { SplashProps } from "shared/browserWinProperties";
-import { ICON_PATH, VIEW_DIR } from "shared/paths";
+import { STATIC_DIR } from "shared/paths";
 
+import { DATA_DIR } from "./constants";
 import { Settings } from "./settings";
+import { fileExistsAsync } from "./utils/fileExists";
 
+<<<<<<< HEAD
 export let splash: BrowserWindow;
 
 const totalTasks = 12;
@@ -24,13 +27,31 @@ export function createSplashWindow() {
         icon: ICON_PATH,
         show: !process.argv.includes("--start-minimized"),
         width: 300,
+=======
+export let splash: BrowserWindow | undefined;
+import { loadView } from "./vesktopStatic";
+
+const totalTasks = 9;
+let doneTasks = 0;
+
+export async function createSplashWindow(startMinimized = false) {
+    splash = new BrowserWindow({
+        ...SplashProps,
+        ...(process.platform === "win32" && { icon: join(STATIC_DIR, "icon.ico") }),
+        show: !startMinimized,
+>>>>>>> upstream/main
         webPreferences: {
             preload: join(__dirname, "splashPreload.js")
         }
     });
 
-    splash.loadFile(join(VIEW_DIR, "splash.html"));
+    loadView(splash, "splash.html");
 
+<<<<<<< HEAD
+=======
+    const { splashBackground, splashColor, splashTheming, splashProgress, splashPixelated } = Settings.store;
+
+>>>>>>> upstream/main
     if (splashTheming !== false) {
         if (splashColor) {
             const semiTransparentSplashColor = splashColor.replace("rgb(", "rgba(").replace(")", ", 0.2)");
@@ -44,6 +65,7 @@ export function createSplashWindow() {
         }
     }
 
+<<<<<<< HEAD
     if (splashAnimationPath) {
         splash.webContents.executeJavaScript(`
             document.getElementById("animation").src = "splash-animation://img";
@@ -52,6 +74,29 @@ export function createSplashWindow() {
         splash.webContents.insertCSS(`img {image-rendering: pixelated}`);
         splash.webContents.executeJavaScript(`
             document.getElementById("animation").src = "../troll.gif";
+=======
+    if (splashPixelated) {
+        splash.webContents.insertCSS(`img { image-rendering: pixelated; }`);
+    }
+
+    if (splashPixelated) {
+        splash.webContents.insertCSS(`img { image-rendering: pixelated; }`);
+    }
+
+    const customSplashPath = join(DATA_DIR, "userAssets", "splash");
+    const hasCustomSplash = await fileExistsAsync(customSplashPath);
+
+    if (!hasCustomSplash) {
+        splash.webContents.insertCSS(`
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(-360deg); }
+            }
+
+            img {
+                animation: spin 2s linear infinite;
+            }
+>>>>>>> upstream/main
         `);
     }
 
@@ -72,7 +117,11 @@ export function createSplashWindow() {
  * Adds a new log count to the splash
  */
 export function addSplashLog() {
+<<<<<<< HEAD
     if (!splash.isDestroyed()) {
+=======
+    if (splash && !splash.isDestroyed()) {
+>>>>>>> upstream/main
         doneTasks++;
         const percentage = Math.min(100, Math.round((doneTasks / totalTasks) * 100));
         splash.webContents.executeJavaScript(`

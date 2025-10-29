@@ -8,7 +8,13 @@ declare global {
     export var VesktopNative: typeof import("preload/VesktopNative").VesktopNative;
     export var Vesktop: typeof import("renderer/index");
     export var VesktopPatchGlobals: any;
+<<<<<<< HEAD
+=======
+    export var Vencord: any;
+
+>>>>>>> upstream/main
     export var IS_DEV: boolean;
+    export var EQUIBOP_GIT_HASH: string;
 }
 
 export {};

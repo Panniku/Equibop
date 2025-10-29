@@ -6,30 +6,39 @@
 
 if (process.platform === "linux") import("./venmic");
 
-import { execFile } from "child_process";
+import { execFile } from "node:child_process";
+import { mkdirSync, readFileSync, watch } from "node:fs";
+import { open, readFile } from "node:fs/promises";
+import { release } from "node:os";
+import { join } from "node:path";
+
 import {
     app,
     BrowserWindow,
     clipboard,
     dialog,
-    IpcMainInvokeEvent,
+    type IpcMainInvokeEvent,
     nativeImage,
-    RelaunchOptions,
+    type RelaunchOptions,
     session,
     shell
 } from "electron";
-import { mkdirSync, readFileSync, watch } from "fs";
-import { open, readFile } from "fs/promises";
 import { enableHardwareAcceleration } from "main";
-import { release } from "os";
-import { join } from "path";
+import { STATIC_DIR } from "shared/paths";
 import { debounce } from "shared/utils/debounce";
 
 import { IpcEvents } from "../shared/IpcEvents";
 import { setBadgeCount } from "./appBadge";
+import { getArRPCStatus } from "./arrpc";
 import { autoStart } from "./autoStart";
+<<<<<<< HEAD
 import { VENCORD_DIR, VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
 import { getAccentColor, mainWin } from "./mainWindow";
+=======
+import { VENCORD_QUICKCSS_FILE, VENCORD_THEMES_DIR } from "./constants";
+import { AppEvents } from "./events";
+import { mainWin } from "./mainWindow";
+>>>>>>> upstream/main
 import { Settings, State } from "./settings";
 import {
     createTrayIcon,
@@ -44,6 +53,7 @@ import { handle, handleSync } from "./utils/ipcWrappers";
 import { PopoutWindows } from "./utils/popout";
 import { isDeckGameMode, showGamePage } from "./utils/steamOS";
 import { isValidVencordInstall } from "./utils/vencordLoader";
+import { VENCORD_DIR } from "./vencordDir";
 
 handleSync(IpcEvents.GET_VENCORD_PRELOAD_FILE, () => join(VENCORD_DIR, "preload.js"));
 handleSync(IpcEvents.GET_VENCORD_RENDERER_SCRIPT, () => readFileSync(join(VENCORD_DIR, "renderer.js"), "utf-8"));
@@ -53,6 +63,7 @@ handleSync(IpcEvents.GET_RENDERER_CSS_FILE, () => join(__dirname, "renderer.css"
 
 handleSync(IpcEvents.GET_SETTINGS, () => Settings.plain);
 handleSync(IpcEvents.GET_VERSION, () => app.getVersion());
+handleSync(IpcEvents.GET_GIT_HASH, () => EQUIBOP_GIT_HASH);
 handleSync(IpcEvents.GET_ENABLE_HARDWARE_ACCELERATION, () => enableHardwareAcceleration);
 
 handleSync(
@@ -63,6 +74,8 @@ handleSync(
 handleSync(IpcEvents.AUTOSTART_ENABLED, () => autoStart.isEnabled());
 handle(IpcEvents.ENABLE_AUTOSTART, autoStart.enable);
 handle(IpcEvents.DISABLE_AUTOSTART, autoStart.disable);
+
+handleSync(IpcEvents.ARRPC_GET_STATUS, () => getArRPCStatus());
 
 handle(IpcEvents.SET_SETTINGS, (_, settings: typeof Settings.store, path?: string) => {
     Settings.setData(settings, path);
@@ -166,7 +179,8 @@ handle(IpcEvents.CLIPBOARD_COPY_IMAGE, async (_, buf: ArrayBuffer, src: string) 
 
 function openDebugPage(page: string) {
     const win = new BrowserWindow({
-        autoHideMenuBar: true
+        autoHideMenuBar: true,
+        ...(process.platform === "win32" && { icon: join(STATIC_DIR, "icon.ico") })
     });
 
     win.loadURL(page);
@@ -179,16 +193,20 @@ function readCss() {
     return readFile(VENCORD_QUICKCSS_FILE, "utf-8").catch(() => "");
 }
 
-open(VENCORD_QUICKCSS_FILE, "a+").then(fd => {
-    fd.close();
-    watch(
-        VENCORD_QUICKCSS_FILE,
-        { persistent: false },
-        debounce(async () => {
-            mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
-        }, 50)
-    );
-});
+open(VENCORD_QUICKCSS_FILE, "a+")
+    .then(fd => {
+        fd.close();
+        watch(
+            VENCORD_QUICKCSS_FILE,
+            { persistent: false },
+            debounce(async () => {
+                mainWin?.webContents.postMessage("VencordQuickCssUpdate", await readCss());
+            }, 50)
+        );
+    })
+    .catch(err => {
+        console.error("Failed to setup quickCss file watcher:", err);
+    });
 
 mkdirSync(VENCORD_THEMES_DIR, { recursive: true });
 watch(
@@ -202,6 +220,7 @@ watch(
     })
 );
 
+<<<<<<< HEAD
 handle(IpcEvents.SET_TRAY_ICON, (_, iconURI) => setTrayIcon(iconURI));
 handle(IpcEvents.GET_TRAY_ICON, (_, iconPath) => getTrayIconFile(iconPath));
 handleSync(IpcEvents.GET_TRAY_ICON_SYNC, (_, iconPath) => getTrayIconFileSync(iconPath));
@@ -212,3 +231,12 @@ handle(IpcEvents.CREATE_TRAY_ICON_RESPONSE, (_, iconName, dataURL, isCustomIcon,
 handle(IpcEvents.GENERATE_TRAY_ICONS, () => generateTrayIcons());
 handle(IpcEvents.SELECT_TRAY_ICON, async (_, iconName) => pickTrayIcon(iconName));
 handle(IpcEvents.GET_ICON_WITH_BADGE, async (_, dataURL) => getIconWithBadge(dataURL));
+=======
+handle(IpcEvents.VOICE_STATE_CHANGED, (_, variant: string) => {
+    AppEvents.emit("setTrayVariant", variant as any);
+});
+
+handle(IpcEvents.VOICE_CALL_STATE_CHANGED, (_, inCall: boolean) => {
+    AppEvents.emit("voiceCallStateChanged", inCall);
+});
+>>>>>>> upstream/main

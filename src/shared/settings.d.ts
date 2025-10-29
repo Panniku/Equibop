@@ -19,6 +19,10 @@ export interface Settings {
     traySpeakingOverride?: boolean;
     trayDeafenedOverride?: boolean;
     minimizeToTray?: boolean;
+<<<<<<< HEAD
+=======
+    autoStartMinimized?: boolean;
+>>>>>>> upstream/main
     middleClickAutoscroll?: boolean;
     openLinksWithElectron?: boolean;
     staticTitle?: boolean;
@@ -27,7 +31,9 @@ export interface Settings {
     hardwareAcceleration?: boolean;
     hardwareVideoAcceleration?: boolean;
     arRPC?: boolean;
+    arRPCDebug?: boolean;
     appBadge?: boolean;
+    badgeOnlyForMentions?: boolean;
     disableMinSize?: boolean;
     clickTrayToShowHide?: boolean;
     customTitleBar?: boolean;
@@ -39,6 +45,10 @@ export interface Settings {
     splashAnimationPath?: string;
     splashBackground?: string;
     splashProgress?: boolean;
+<<<<<<< HEAD
+=======
+    splashPixelated?: boolean;
+>>>>>>> upstream/main
 
     spellCheckLanguages?: string[];
 
@@ -61,11 +71,19 @@ export interface State {
     maximized?: boolean;
     minimized?: boolean;
     windowBounds?: Rectangle;
-    displayId: int;
 
     firstLaunch?: boolean;
 
     steamOSLayoutVersion?: number;
+    linuxAutoStartEnabled?: boolean;
 
     equicordDir?: string;
+<<<<<<< HEAD
+=======
+
+    updater?: {
+        ignoredVersion?: string;
+        snoozeUntil?: number;
+    };
+>>>>>>> upstream/main
 }

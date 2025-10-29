@@ -4,8 +4,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import "./cli";
+import "./updater";
 import "./ipc";
+import "./userAssets";
+import "./vesktopProtocol";
 
+<<<<<<< HEAD
 import { app, BrowserWindow, nativeTheme, net, protocol } from "electron";
 import { autoUpdater } from "electron-updater";
 import { IpcEvents } from "shared/IpcEvents";
@@ -18,15 +23,27 @@ import { registerMediaPermissionsHandler } from "./mediaPermissions";
 import { registerScreenShareHandler } from "./screenShare";
 import { Settings, State } from "./settings";
 import { addSplashLog, createSplashWindow } from "./splash";
-import { isDeckGameMode } from "./utils/steamOS";
+=======
+import { app, BrowserWindow, nativeTheme } from "electron";
 
-if (!IS_DEV) {
-    autoUpdater.checkForUpdatesAndNotify();
-}
+import { DATA_DIR } from "./constants";
+import { createFirstLaunchTour } from "./firstLaunch";
+import { createWindows } from "./mainWindow";
+import { registerMediaPermissionsHandler } from "./mediaPermissions";
+import { registerScreenShareHandler } from "./screenShare";
+import { Settings, State } from "./settings";
+import { setAsDefaultProtocolClient } from "./utils/setAsDefaultProtocolClient";
+>>>>>>> upstream/main
+import { isDeckGameMode } from "./utils/steamOS";
 
 console.log("Equibop v" + app.getVersion());
 
+<<<<<<< HEAD
+console.log("Equibop v" + app.getVersion());
+
 // Make the Vencord files use our DATA_DIR
+=======
+>>>>>>> upstream/main
 process.env.EQUICORD_USER_DATA_DIR = DATA_DIR;
 
 const isLinux = process.platform === "linux";
@@ -34,6 +51,7 @@ const isLinux = process.platform === "linux";
 export let enableHardwareAcceleration = true;
 
 function init() {
+<<<<<<< HEAD
     app.setAsDefaultProtocolClient("discord");
     initKeybinds();
 
@@ -44,6 +62,11 @@ function init() {
         splashAnimationPath,
         arguments: args
     } = Settings.store;
+=======
+    setAsDefaultProtocolClient("discord");
+
+    const { disableSmoothScroll, hardwareAcceleration, hardwareVideoAcceleration, arguments: args } = Settings.store;
+>>>>>>> upstream/main
 
     const enabledFeatures = new Set(app.commandLine.getSwitchValue("enable-features").split(","));
     const disabledFeatures = new Set(app.commandLine.getSwitchValue("disable-features").split(","));
@@ -78,10 +101,18 @@ function init() {
     if (process.platform === "win32") {
         disabledFeatures.add("CalculateNativeWinOcclusion");
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
     if (args) {
         app.commandLine.appendArgument(args);
         console.log("Running with additional arguments:", args);
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> upstream/main
     // work around chrome 66 disabling autoplay by default
     app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -114,6 +145,7 @@ function init() {
     // In the Flatpak on SteamOS the theme is detected as light, but SteamOS only has a dark mode, so we just override it
     if (isDeckGameMode) nativeTheme.themeSource = "dark";
 
+<<<<<<< HEAD
     app.on("second-instance", (_event, commandLine, _cwd, data: any) => {
         if (data.IS_DEV) app.quit();
         else if (mainWin) {
@@ -136,6 +168,10 @@ function init() {
 
         createSplashWindow();
         addSplashLog();
+=======
+    app.whenReady().then(async () => {
+        if (process.platform === "win32") app.setAppUserModelId("org.equicord.equibop");
+>>>>>>> upstream/main
 
         registerScreenShareHandler();
         registerMediaPermissionsHandler();
@@ -155,6 +191,7 @@ function init() {
     });
 }
 
+<<<<<<< HEAD
 if (!app.requestSingleInstanceLock({ IS_DEV })) {
     if (IS_DEV) {
         console.log("Equibop is already running. Quitting previous instance...");
@@ -166,6 +203,9 @@ if (!app.requestSingleInstanceLock({ IS_DEV })) {
 } else {
     init();
 }
+=======
+init();
+>>>>>>> upstream/main
 
 async function bootstrap() {
     if (!Object.hasOwn(State.store, "firstLaunch")) {

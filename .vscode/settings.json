@@ -21,5 +21,9 @@
     "[jsonc]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
+<<<<<<< HEAD
     "cSpell.words": ["Vesktop", "Equibop"]
+=======
+    "cSpell.words": ["Equibop"]
+>>>>>>> upstream/main
 }

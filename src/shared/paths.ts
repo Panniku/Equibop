@@ -8,7 +8,9 @@ import { DATA_DIR } from "main/constants";
 import { join } from "path";
 
 export const STATIC_DIR = /* @__PURE__ */ join(__dirname, "..", "..", "static");
-export const VIEW_DIR = /* @__PURE__ */ join(STATIC_DIR, "views");
 export const BADGE_DIR = /* @__PURE__ */ join(STATIC_DIR, "badges");
+<<<<<<< HEAD
 export const ICON_PATH = /* @__PURE__ */ join(STATIC_DIR, "icon.png");
+=======
+>>>>>>> upstream/main
 export const ICONS_DIR = /* @__PURE__ */ join(DATA_DIR, "TrayIcons");

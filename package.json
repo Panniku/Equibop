@@ -1,5 +1,6 @@
 {
     "name": "equibop",
+<<<<<<< HEAD
     "version": "2.1.6",
     "private": true,
     "description": "A fork of Vesktop pre-packaged with Equicord",
@@ -7,73 +8,95 @@
     "homepage": "https://github.com/Equicord/Equibop",
     "license": "GPL-3.0 or later",
     "author": "Equicord",
+=======
+    "version": "3.0.8",
+    "private": true,
+    "description": "Equibop is a custom Discord desktop app",
+    "keywords": [],
+    "homepage": "https://equicord.org",
+    "license": "GPL-3.0-or-later",
+    "author": "Equicord <contact@equicord.org>",
+>>>>>>> upstream/main
     "main": "dist/js/main.js",
     "scripts": {
-        "build": "tsx scripts/build/build.mts",
-        "build:dev": "pnpm build --dev",
-        "package": "pnpm build && electron-builder",
-        "package:dir": "pnpm build && electron-builder --dir",
+        "build": "bun run scripts/build/build.mts",
+        "build:dev": "bun run build --dev",
+        "buildLibVesktop": "bun install --cwd packages/libvesktop && bun run --cwd packages/libvesktop build",
+        "package": "bun run build && electron-builder",
+        "package:dir": "bun run build && electron-builder --dir",
         "lint": "eslint",
-        "lint:fix": "pnpm lint --fix",
-        "start": "pnpm build && electron .",
-        "start:dev": "pnpm build:dev && electron .",
-        "start:watch": "pnpm build:dev && tsx scripts/startWatch.mts",
-        "test": "pnpm lint && pnpm testTypes",
+        "lint:fix": "bun lint --fix",
+        "start": "bun run build && electron .",
+        "start:dev": "bun run build:dev && electron .",
+        "start:watch": "bun run build:dev && bun run scripts/startWatch.mts",
+        "test": "bun lint && bun testTypes",
         "testTypes": "tsc --noEmit",
-        "watch": "pnpm build --watch",
-        "updateMeta": "tsx scripts/utils/updateMeta.mts",
-        "updateArrpcDB": "node ./node_modules/arrpc/update_db.js",
-        "postinstall": "pnpm updateArrpcDB"
+        "watch": "bun run build --watch",
+        "generateMeta": "bun run scripts/utils/generateMeta.mts",
+        "updateArrpcDB": "bun ./node_modules/arrpc-bun/scripts/update_db.ts",
+        "downloadBun": "bun run scripts/build/downloadBun.mts",
+        "postinstall": "bun updateArrpcDB"
     },
     "dependencies": {
-        "arrpc": "github:OpenAsar/arrpc#2234e9c9111f4c42ebcc3aa6a2215bfd979eef77",
-        "electron-updater": "^6.6.2"
+        "arrpc-bun": "latest",
+        "electron-updater": "^6.7.0"
     },
     "optionalDependencies": {
         "@homebridge/dbus-native": "0.6.0",
         "@vencord/venmic": "^6.1.0"
     },
     "devDependencies": {
+        "@equicord/types": "^1.13.3",
         "@fal-works/esbuild-plugin-global-externals": "^2.1.2",
-        "@stylistic/eslint-plugin": "^5.1.0",
-        "@types/node": "^24.0.10",
-        "@types/react": "18.3.1",
-        "@vencord/types": "^1.11.5",
-        "dotenv": "^16.5.0",
-        "electron": "^37.2.0",
+        "@stylistic/eslint-plugin": "^5.5.0",
+        "@types/node": "^24.9.1",
+        "@types/react": "19.2.1",
+        "dotenv": "^17.2.3",
+        "electron": "^38.4.0",
         "electron-builder": "^26.0.12",
-        "esbuild": "^0.25.5",
-        "eslint": "^9.30.1",
+        "esbuild": "^0.25.11",
+        "eslint": "^9.38.0",
         "eslint-import-resolver-alias": "^1.1.2",
         "eslint-plugin-path-alias": "^2.1.0",
-        "eslint-plugin-prettier": "^5.5.1",
+        "eslint-plugin-prettier": "^5.5.4",
         "eslint-plugin-simple-header": "^1.2.2",
         "eslint-plugin-simple-import-sort": "^12.1.1",
-        "eslint-plugin-unused-imports": "^4.1.4",
+        "eslint-plugin-unused-imports": "^4.3.0",
+        "libvesktop": "file:packages/libvesktop",
         "prettier": "^3.6.2",
         "source-map-support": "^0.5.21",
-        "tsx": "^4.20.3",
-        "type-fest": "^4.41.0",
-        "typescript": "^5.8.3",
-        "typescript-eslint": "^8.35.1",
-        "xml-formatter": "^3.6.6"
+        "type-fest": "^5.1.0",
+        "typescript": "^5.9.3",
+        "typescript-eslint": "^8.46.2",
+        "xml-formatter": "^3.6.7"
     },
-    "packageManager": "pnpm@10.7.1",
+    "packageManager": "bun@latest",
     "engines": {
         "node": ">=18",
-        "pnpm": ">=8"
+        "bun": ">=1.2.0"
     },
     "build": {
+<<<<<<< HEAD
         "appId": "io.github.equicord.equibop",
         "artifactName": "${productName}-${os}-${arch}.${ext}",
         "productName": "Equibop",
+=======
+        "appId": "org.equicord.equibop",
+        "productName": "Equibop",
+        "executableName": "equibop",
+        "asarUnpack": [
+            "dist/js/arrpc/**/*",
+            "node_modules/arrpc-bun/**/*"
+        ],
+>>>>>>> upstream/main
         "files": [
             "!*",
             "!node_modules",
             "dist/js",
             "static",
             "package.json",
-            "LICENSE"
+            "LICENSE",
+            "node_modules/arrpc-bun/**/*"
         ],
         "protocols": {
             "name": "Discord",
@@ -81,11 +104,16 @@
                 "discord"
             ]
         },
-        "beforePack": "scripts/build/sandboxFix.js",
+        "beforePack": "scripts/build/beforePack.mjs",
+        "afterPack": "scripts/build/afterPack.mjs",
         "linux": {
-            "icon": "build/icon.icns",
+            "icon": "build/icon.svg",
             "category": "Network",
+<<<<<<< HEAD
             "maintainer": "no-reply@thororen.com",
+=======
+            "maintainer": "contact@equicord.org",
+>>>>>>> upstream/main
             "target": [
                 {
                     "target": "deb",
@@ -122,18 +150,24 @@
                     "GenericName": "Internet Messenger",
                     "Type": "Application",
                     "Categories": "Network;InstantMessaging;Chat;",
+<<<<<<< HEAD
                     "Keywords": "discord;equibop;vesktop;vencord;equicord;electron;chat;",
+=======
+                    "Keywords": "discord;vencord;electron;chat;equibop",
+>>>>>>> upstream/main
                     "MimeType": "x-scheme-handler/discord",
                     "StartupWMClass": "equibop"
                 }
             }
         },
+        "deb": {},
         "mac": {
             "target": [
                 {
                     "target": "default",
                     "arch": [
-                        "universal"
+                        "x64",
+                        "arm64"
                     ]
                 }
             ],
@@ -143,8 +177,15 @@
                 "NSMicrophoneUsageDescription": "This app needs access to the microphone",
                 "NSCameraUsageDescription": "This app needs access to the camera",
                 "com.apple.security.device.audio-input": true,
+<<<<<<< HEAD
                 "com.apple.security.device.camera": true
             }
+=======
+                "com.apple.security.device.camera": true,
+                "CFBundleIconName": "Icon"
+            },
+            "notarize": true
+>>>>>>> upstream/main
         },
         "dmg": {
             "icon": "build/icon.icns",
@@ -171,6 +212,7 @@
             "oneClick": false
         },
         "win": {
+            "icon": "build/icon.ico",
             "target": [
                 {
                     "target": "nsis",
@@ -198,15 +240,10 @@
             ]
         }
     },
-    "pnpm": {
-        "patchedDependencies": {
-            "arrpc@3.5.0": "patches/arrpc@3.5.0.patch",
-            "electron-updater": "patches/electron-updater.patch"
-        },
-        "onlyBuiltDependencies": [
-            "@vencord/venmic",
-            "electron",
-            "esbuild"
-        ]
-    }
+    "trustedDependencies": [
+        "@vencord/venmic",
+        "electron",
+        "electron-winstaller",
+        "esbuild"
+    ]
 }

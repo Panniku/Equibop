@@ -20,14 +20,16 @@ export const DATA_DIR =
 
 mkdirSync(DATA_DIR, { recursive: true });
 
-const SESSION_DATA_DIR = join(DATA_DIR, "sessionData");
+export const SESSION_DATA_DIR = join(DATA_DIR, "sessionData");
 app.setPath("sessionData", SESSION_DATA_DIR);
 
 export const VENCORD_SETTINGS_DIR = join(DATA_DIR, "settings");
+mkdirSync(VENCORD_SETTINGS_DIR, { recursive: true });
 export const VENCORD_QUICKCSS_FILE = join(VENCORD_SETTINGS_DIR, "quickCss.css");
 export const VENCORD_SETTINGS_FILE = join(VENCORD_SETTINGS_DIR, "settings.json");
 export const VENCORD_THEMES_DIR = join(DATA_DIR, "themes");
 
+<<<<<<< HEAD
 // needs to be inline require because of circular dependency
 // as otherwise "DATA_DIR" (which is used by ./settings) will be uninitialised
 export const VENCORD_DIR = (() => {
@@ -35,6 +37,8 @@ export const VENCORD_DIR = (() => {
     return State.store.equicordDir ? join(State.store.equicordDir, "equibop") : join(SESSION_DATA_DIR, "equicord.asar");
 })();
 
+=======
+>>>>>>> upstream/main
 export const USER_AGENT = `Equibop/${app.getVersion()} (https://github.com/Equicord/Equibop)`;
 
 // dimensions shamelessly stolen from Discord Desktop :3
@@ -59,5 +63,12 @@ export const enum MessageBoxChoice {
     Cancel
 }
 
+<<<<<<< HEAD
 export const isWayland =
     process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+=======
+export const IS_FLATPAK = process.env.FLATPAK_ID !== undefined;
+export const isWayland =
+    process.platform === "linux" && (process.env.XDG_SESSION_TYPE === "wayland" || !!process.env.WAYLAND_DISPLAY);
+export const isLinux = process.platform === "linux";
+>>>>>>> upstream/main

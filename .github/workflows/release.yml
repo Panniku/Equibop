@@ -6,7 +6,12 @@ on:
             - v*
     workflow_dispatch:
 
+<<<<<<< HEAD
 permissions: write-all
+=======
+permissions:
+    contents: write
+>>>>>>> upstream/main
 
 jobs:
     release:
@@ -25,30 +30,35 @@ jobs:
 
         steps:
             - uses: actions/checkout@v4
-            - uses: pnpm/action-setup@v4 # Install pnpm using packageManager key in package.json
-
-            - name: Use Node.js 20
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 20
-                  cache: "pnpm"
+            - uses: oven-sh/setup-bun@v2
 
             - name: Install dependencies
+<<<<<<< HEAD
               run: pnpm install --no-frozen-lockfile
+=======
+              run: bun install
+>>>>>>> upstream/main
 
             - name: Build
-              run: pnpm build
+              run: bun run build
 
             - name: Run Electron Builder
               if: ${{ matrix.platform != 'mac' }}
               run: |
-                  pnpm electron-builder --${{ matrix.platform }} --publish always
+                  bun run electron-builder --${{ matrix.platform }} --publish always
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
             - name: Run Electron Builder
               if: ${{ matrix.platform == 'mac' }}
               run: |
+<<<<<<< HEAD
                   pnpm electron-builder --${{ matrix.platform }} --publish always
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+=======
+                  bun run electron-builder --${{ matrix.platform }} --publish always
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+>>>>>>> upstream/main

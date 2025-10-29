@@ -3,5 +3,10 @@ node_modules
 .env
 .DS_Store
 .idea/
+<<<<<<< HEAD
 .pnpm-store/
 .direnv
+=======
+.zed
+resources
+>>>>>>> upstream/main

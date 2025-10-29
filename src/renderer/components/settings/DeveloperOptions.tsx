@@ -13,11 +13,11 @@ import {
     ModalSize,
     openModal,
     useForceUpdater
-} from "@vencord/types/utils";
-import { Button, Forms, Text, Toasts } from "@vencord/types/webpack/common";
+} from "@equicord/types/utils";
+import { Button, Forms, Text, Toasts } from "@equicord/types/webpack/common";
 import { Settings } from "shared/settings";
 
-import { SettingsComponent } from "./Settings";
+import { cl, SettingsComponent } from "./Settings";
 
 export const DeveloperOptionsButton: SettingsComponent = ({ settings }) => {
     return <Button onClick={() => openDeveloperOptionsModal(settings)}>Open Developer Settings</Button>;
@@ -38,8 +38,13 @@ function openDeveloperOptionsModal(settings: Settings) {
                     <Forms.FormTitle tag="h5" className={Margins.top16}>
                         Debugging
                     </Forms.FormTitle>
+<<<<<<< HEAD
                     <div className="vcd-settings-button-grid">
                         <Button onClick={() => VesktopNative.debug.launchGpu()}>chrome://gpu</Button>
+=======
+                    <div className={cl("button-grid")}>
+                        <Button onClick={() => VesktopNative.debug.launchGpu()}>Open chrome://gpu</Button>
+>>>>>>> upstream/main
                         <Button onClick={() => VesktopNative.debug.launchWebrtcInternals()}>
                             chrome://webrtc-internals
                         </Button>
@@ -71,7 +76,7 @@ const VencordLocationPicker: SettingsComponent = ({ settings }) => {
                     "the default location"
                 )}
             </Forms.FormText>
-            <div className="vcd-settings-button-grid">
+            <div className={cl("button-grid")}>
                 <Button
                     size={Button.Sizes.SMALL}
                     onClick={async () => {

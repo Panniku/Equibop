@@ -7,14 +7,21 @@
 Equibop is a fork of [Vesktop](https://github.com/Vencord/Vesktop).
 
 You can join our [discord server](https://equicord.org/discord) for commits, changes, chat or even support.<br></br>
+<<<<<<< HEAD
 
 ## Main features
 
+=======
+
+**Main features**:
+- Equicord preinstalled
+>>>>>>> upstream/main
 - Much more lightweight and faster than the official Discord app
 - Linux Screenshare with sound & wayland
 
 **Extra included changes**
 
+<<<<<<< HEAD
 - Equicord preinstalled
 - Custom Splash animations from [this PR](https://github.com/Vencord/Vesktop/pull/355)
 - Tray Customization & Voice detection and Badge from [this PR](https://github.com/Vencord/Vesktop/pull/517)
@@ -30,9 +37,24 @@ You can join our [discord server](https://equicord.org/discord) for commits, cha
 **Not fully Supported**:
 <!-- not supported on windows yet lol -->
 - Global Keybinds
+=======
+- Tray Customization with voice detection and notification badges
+- Command-line flags to toggle microphone and deafen status (Linux)
+- Custom Arguments from [this PR](https://github.com/Equicord/Equibop/pull/46)
+- arRPC-bun with debug logging support https://github.com/Creationsss/arrpc-bun
+
+**Linux Note**:
+
+- You can use the `--toggle-mic` & `--toggle-deafen` flags to toggle your microphone and deafen status from the terminal. These can be bound to keyboard shortcuts at the system level.
+
+**Not fully Supported**:
+- Global Keybinds (Windows/macOS - use command-line flags on Linux instead)
+>>>>>>> upstream/main
 
 ## Installing
+Check the [Releases](https://github.com/Equicord/Equibop/releases) page
 
+<<<<<<< HEAD
 ### Windows
 
 If you don't know the difference, pick the Installer.
@@ -51,11 +73,17 @@ These work on both M Series and Intel Series Macs
 
 - [DMG](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-mac-universal.dmg)
 - [ZIP](https://github.com/Equicord/Equibop/releases/latest/download/Equibop-mac-universal.zip)
+=======
+OR
+
+Check The Downloads from the [website](https://equicord.org/downloads)
+>>>>>>> upstream/main
 
 ### Linux
 
 [![Equibop](https://img.shields.io/badge/AVAILABLE_ON_THE_AUR-333232?style=for-the-badge&logo=arch-linux&logoColor=0F94D2&labelColor=%23171717)](https://aur.archlinux.org/packages?O=0&K=equibop)
 <br>
+<<<<<<< HEAD
 <a href="https://flathub.org/apps/io.github.equicord.equibop">
   <img src="https://flathub.org/api/badge?svg" alt="Download on Flathub" style="width:220px; height:auto;">
 </a>
@@ -76,6 +104,15 @@ If you don't know the difference, pick amd64.
 #### Community packages
 
 Below you can find unofficial packages created by the community. They are not officially supported by us, so before reporting issues, please first confirm the issue also happens on official builds. When in doubt, consult with their packager first. The flatpak and AppImage should work on any distro that [supports them](https://flatpak.org/setup/), so I recommend you just use those instead!
+=======
+<!-- <a href="https://flathub.org/apps/io.github.equicord.equibop">
+  <img src="https://flathub.org/api/badge?svg" alt="Download on Flathub" style="width:220px; height:auto;">
+</a> -->
+
+#### Community packages
+
+Below you can find unofficial packages created by the community. They are not officially supported by us, so before reporting issues, please first confirm the issue also happens on official builds. When in doubt, consult with their packager first. The AppImage should work on any distro that supports them, so I recommend you just use that instead!
+>>>>>>> upstream/main
 
 - Arch Linux: [Equibop on the Arch user repository](https://aur.archlinux.org/packages?K=equibop)
 - NixOS: `nix-shell -p equibop`
@@ -85,8 +122,7 @@ Below you can find unofficial packages created by the community. They are not of
 You need to have the following dependencies installed:
 
 - [Git](https://git-scm.com/downloads)
-- [Node.js](https://nodejs.org/en/download)
-- pnpm: `npm install --global pnpm`
+- [Bun](https://bun.sh)
 
 Packaging will create builds in the dist/ folder
 
@@ -98,17 +134,28 @@ git clone https://github.com/Equicord/Equibop
 cd Equibop
 
 # Install Dependencies
-pnpm i
+bun install
 
 # Either run it without packaging
-pnpm start
+bun start
 
 # Or package (will build packages for your OS)
-pnpm package
+bun package
 
 # Or only build the Linux Pacman package
-pnpm package --linux pacman
+bun package --linux pacman
 
 # Or package to a directory only
-pnpm package:dir
+bun package:dir
 ```
+
+## Building LibVesktop from Source
+
+This is a small C++ helper library Equibop uses on Linux to emit D-Bus events. By default, prebuilt binaries for x64 and arm64 are used.
+
+If you want to build it from source:
+1. Install build dependencies:
+    - Debian/Ubuntu: `apt install build-essential python3 curl pkg-config libglib2.0-dev`
+    - Fedora: `dnf install @c-development @development-tools python3 curl pkgconf-pkg-config glib2-devel`
+2. Run `bun buildLibVesktop`
+3. From now on, building Equibop will use your own build

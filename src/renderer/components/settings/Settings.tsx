@@ -6,8 +6,9 @@
 
 import "./settings.css";
 
-import { ErrorBoundary } from "@vencord/types/components";
-import { Forms, Text } from "@vencord/types/webpack/common";
+import { classNameFactory } from "@equicord/types/api/Styles";
+import { Divider, ErrorBoundary } from "@equicord/types/components";
+import { Text } from "@equicord/types/webpack/common";
 import { ComponentType } from "react";
 import { Settings, useSettings } from "renderer/settings";
 import { isLinux, isMac, isWindows } from "renderer/utils";
@@ -18,6 +19,7 @@ import { CustomSplashAnimation } from "./CustomSplashAnimation";
 import { DeveloperOptionsButton } from "./DeveloperOptions";
 import { DiscordBranchPicker } from "./DiscordBranchPicker";
 import { NotificationBadgeToggle } from "./NotificationBadgeToggle";
+<<<<<<< HEAD
 import {
     CustomizeTraySwitch,
     TrayColorTypeSelect,
@@ -25,6 +27,10 @@ import {
     TrayIconPicker,
     TraySwitch
 } from "./TraySettings";
+=======
+import { Updater } from "./Updater";
+import { UserAssetsButton } from "./UserAssets";
+>>>>>>> upstream/main
 import { VesktopSettingsSwitch } from "./VesktopSettingsSwitch";
 import { WindowsTransparencyControls } from "./WindowsTransparencyControls";
 interface BooleanSetting {
@@ -35,6 +41,8 @@ interface BooleanSetting {
     disabled?(): boolean;
     invisible?(): boolean;
 }
+
+export const cl = classNameFactory("vcd-settings-");
 
 export type SettingsComponent = ComponentType<{ settings: typeof Settings.store }>;
 
@@ -90,14 +98,33 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description: "Adapt the splash window colors to your custom theme",
             defaultValue: true
         },
-        WindowsTransparencyControls
+        {
+            key: "splashProgress",
+            title: "Show progress bar in Splash",
+            description: "Adds a fancy progress bar to the splash window",
+            defaultValue: false
+        },
+        WindowsTransparencyControls,
+        UserAssetsButton
     ],
+<<<<<<< HEAD
     Tray: [
         TraySwitch,
         CustomizeTraySwitch,
         TrayColorTypeSelect,
         TrayIconPicker,
         TrayFillColorSwitch,
+=======
+    Behaviour: [
+        Arguments,
+        {
+            key: "tray",
+            title: "Tray Icon",
+            description: "Add a tray icon for Equibop",
+            defaultValue: true,
+            invisible: () => isMac
+        },
+>>>>>>> upstream/main
         {
             key: "minimizeToTray",
             title: "Minimize to tray",
@@ -109,12 +136,17 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             key: "clickTrayToShowHide",
             title: "Hide/Show on tray click",
             description: "Left clicking tray icon will toggle the equibop window visibility.",
+<<<<<<< HEAD
             defaultValue: false,
             invisible: () => Settings.store.tray === false
         }
     ],
     Behaviour: [
         Arguments,
+=======
+            defaultValue: false
+        },
+>>>>>>> upstream/main
         {
             key: "disableMinSize",
             title: "Disable minimum window size",
@@ -143,10 +175,19 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             description: "Enables Rich Presence via arRPC",
             defaultValue: false
         },
+        {
+            key: "arRPCDebug",
+            title: "Rich Presence Debug Logging",
+            description:
+                "Enables detailed debug logging for arRPC (bun path detection, process spawning, IPC messages, etc.)",
+            defaultValue: false,
+            disabled: () => Settings.store.arRPC === false
+        },
 
         {
             key: "openLinksWithElectron",
             title: "Open Links in app (experimental)",
+<<<<<<< HEAD
             description: "Opens links in a new Equibop window instead of your web browser",
             defaultValue: false
         },
@@ -155,6 +196,9 @@ const SettingsOptions: Record<string, Array<BooleanSetting | SettingsComponent>>
             key: "splashProgress",
             title: "Show progress bar in Splash",
             description: "Adds a fancy progress bar to the splash window",
+=======
+            description: "Opens links in a new equibop window instead of your web browser",
+>>>>>>> upstream/main
             defaultValue: false
         }
     ],
@@ -166,12 +210,12 @@ function SettingsSections() {
     const Settings = useSettings();
 
     const sections = Object.entries(SettingsOptions).map(([title, settings], i, arr) => (
-        <div key={title} className="vcd-settings-category">
-            <Text variant="heading-lg/semibold" color="header-primary" className="vcd-settings-category-title">
+        <div key={title} className={cl("category")}>
+            <Text variant="heading-lg/semibold" color="header-primary" className={cl("category-title")}>
                 {title}
             </Text>
 
-            <div className="vcd-settings-category-content">
+            <div className={cl("category-content")}>
                 {settings.map(Setting => {
                     if (typeof Setting === "function") return <Setting settings={Settings} />;
 
@@ -180,19 +224,18 @@ function SettingsSections() {
 
                     return (
                         <VesktopSettingsSwitch
+                            title={title}
+                            description={description}
                             value={Settings[key as any] ?? defaultValue}
                             onChange={v => (Settings[key as any] = v)}
-                            note={description}
                             disabled={disabled?.()}
                             key={key}
-                        >
-                            {title}
-                        </VesktopSettingsSwitch>
+                        />
                     );
                 })}
             </div>
 
-            {i < arr.length - 1 && <Forms.FormDivider className="vcd-settings-category-divider" />}
+            {i < arr.length - 1 && <Divider className={cl("category-divider")} />}
         </div>
     ));
 
@@ -202,18 +245,29 @@ function SettingsSections() {
 export default ErrorBoundary.wrap(
     function SettingsUI() {
         return (
+<<<<<<< HEAD
             <Forms.FormSection>
                 {/* FIXME: Outdated type */}
                 {/* @ts-expect-error Outdated type */}
                 <Text variant="heading-xl/semibold" color="header-primary" className="vcd-settings-title">
                     Equibop Settings
+=======
+            <section>
+                <Text variant="heading-xl/semibold" color="header-primary" className={cl("title")}>
+                    Vesktop Settings
+>>>>>>> upstream/main
                 </Text>
+                <Updater />
                 <SettingsSections />
-            </Forms.FormSection>
+            </section>
         );
     },
     {
         message:
+<<<<<<< HEAD
             "Failed to render the Equibop Settings tab. If this issue persists, try to right click the Equibop tray icon, then click 'Repair Vencord'. And make sure your Equibop is up to date."
+=======
+            "Failed to render the Equibop Settings tab. If this issue persists, try to right click the Equibop tray icon, then click 'Repair Equicord'. And make sure your Equibop is up to date."
+>>>>>>> upstream/main
     }
 );

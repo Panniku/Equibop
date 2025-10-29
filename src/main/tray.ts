@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+<<<<<<< HEAD
 import { dialog, NativeImage, nativeImage, nativeTheme } from "electron";
 import { mkdirSync, readFileSync, writeFileSync } from "fs";
 import { readFile } from "fs/promises";
@@ -190,3 +191,102 @@ export async function getIconWithBadge(dataURL: string) {
 nativeTheme.on("updated", () => {
     generateTrayIcons();
 });
+=======
+import { app, BrowserWindow, Menu, Tray } from "electron";
+
+import { createAboutWindow } from "./about";
+import { restartArRPC } from "./arrpc";
+import { AppEvents } from "./events";
+import { Settings } from "./settings";
+import { resolveAssetPath, UserAssetType } from "./userAssets";
+import { clearData } from "./utils/clearData";
+import { downloadVencordAsar } from "./utils/vencordLoader";
+
+type TrayVariant = "tray" | "trayUnread" | "traySpeaking" | "trayIdle" | "trayMuted" | "trayDeafened";
+
+let tray: Tray;
+let trayVariant: TrayVariant = "tray";
+
+AppEvents.on("userAssetChanged", async asset => {
+    if (tray && asset.startsWith("tray")) {
+        tray.setImage(await resolveAssetPath(trayVariant as UserAssetType));
+    }
+});
+
+AppEvents.on("setTrayVariant", async (variant: TrayVariant) => {
+    if (trayVariant === variant) return;
+
+    trayVariant = variant;
+    if (!tray) return;
+
+    const iconPath = await resolveAssetPath(trayVariant as UserAssetType);
+    tray.setImage(iconPath);
+});
+
+export function destroyTray() {
+    tray?.destroy();
+}
+
+export async function initTray(win: BrowserWindow, setIsQuitting: (val: boolean) => void) {
+    const onTrayClick = () => {
+        if (Settings.store.clickTrayToShowHide && win.isVisible()) win.hide();
+        else win.show();
+    };
+
+    const trayMenu = Menu.buildFromTemplate([
+        {
+            label: "Open",
+            click() {
+                win.show();
+            }
+        },
+        {
+            label: "About",
+            click: createAboutWindow
+        },
+        {
+            label: "Repair Equicord",
+            async click() {
+                await downloadVencordAsar();
+                app.relaunch();
+                app.quit();
+            }
+        },
+        {
+            label: "Reset Equibop",
+            async click() {
+                await clearData(win);
+            }
+        },
+        {
+            label: "Restart arRPC",
+            visible: Settings.store.arRPC === true,
+            async click() {
+                await restartArRPC();
+            }
+        },
+        {
+            type: "separator"
+        },
+        {
+            label: "Restart",
+            click() {
+                app.relaunch();
+                app.quit();
+            }
+        },
+        {
+            label: "Quit",
+            click() {
+                setIsQuitting(true);
+                app.quit();
+            }
+        }
+    ]);
+
+    tray = new Tray(await resolveAssetPath(trayVariant));
+    tray.setToolTip("Equibop");
+    tray.setContextMenu(trayMenu);
+    tray.on("click", onTrayClick);
+}
+>>>>>>> upstream/main

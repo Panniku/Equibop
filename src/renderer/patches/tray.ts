@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+<<<<<<< HEAD
 import { Logger } from "@vencord/types/utils";
 import { findByPropsLazy, onceReady } from "@vencord/types/webpack";
 import { FluxDispatcher, UserStore } from "@vencord/types/webpack/common";
@@ -107,19 +108,64 @@ VesktopNative.tray.setCurrentVoiceIcon(() => {
 
 onceReady.then(() => {
     VesktopNative.tray.generateTrayIcons();
+=======
+import { findStoreLazy, onceReady } from "@equicord/types/webpack";
+import { FluxDispatcher, UserStore } from "@equicord/types/webpack/common";
+
+import { setBadge } from "../appBadge";
+
+const MediaEngineStore = findStoreLazy("MediaEngineStore");
+
+type TrayVariant = "tray" | "trayUnread" | "traySpeaking" | "trayIdle" | "trayMuted" | "trayDeafened";
+
+let isInCall = false;
+let currentVariant: TrayVariant | null = null;
+
+function getTrayVariantForVoiceState(): TrayVariant | null {
+    if (!isInCall) return null;
+
+    if (MediaEngineStore.isSelfDeaf()) return "trayDeafened";
+    if (MediaEngineStore.isSelfMute()) return "trayMuted";
+    return "trayIdle";
+}
+
+function updateTrayIcon() {
+    const newVariant = getTrayVariantForVoiceState();
+
+    if (newVariant !== currentVariant) {
+        currentVariant = newVariant;
+
+        if (newVariant) {
+            VesktopNative.tray.setVoiceState(newVariant);
+        }
+    }
+}
+
+onceReady.then(() => {
+>>>>>>> upstream/main
     const userID = UserStore.getCurrentUser().id;
 
     FluxDispatcher.subscribe("SPEAKING", params => {
         if (params.userId === userID && params.context === "default") {
             if (params.speakingFlags) {
+<<<<<<< HEAD
                 VesktopNative.tray.setIcon("speaking");
             } else {
                 setCurrentTrayIcon();
+=======
+                if (currentVariant !== "traySpeaking") {
+                    currentVariant = "traySpeaking";
+                    VesktopNative.tray.setVoiceState("traySpeaking");
+                }
+            } else {
+                updateTrayIcon();
+>>>>>>> upstream/main
             }
         }
     });
 
     FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_DEAF", () => {
+<<<<<<< HEAD
         if (isInCall) setCurrentTrayIcon();
     });
 
@@ -134,6 +180,27 @@ onceReady.then(() => {
         } else if (params.state === "RTC_DISCONNECTED" && params.context === "default") {
             VesktopNative.tray.setIcon("icon");
             isInCall = false;
+=======
+        if (isInCall) updateTrayIcon();
+    });
+
+    FluxDispatcher.subscribe("AUDIO_TOGGLE_SELF_MUTE", () => {
+        if (isInCall) updateTrayIcon();
+    });
+
+    FluxDispatcher.subscribe("RTC_CONNECTION_STATE", params => {
+        if (params.context === "default") {
+            if (params.state === "RTC_CONNECTED") {
+                isInCall = true;
+                VesktopNative.tray.setVoiceCallState(true);
+                updateTrayIcon();
+            } else if (params.state === "RTC_DISCONNECTED") {
+                isInCall = false;
+                currentVariant = null;
+                VesktopNative.tray.setVoiceCallState(false);
+                setBadge();
+            }
+>>>>>>> upstream/main
         }
     });
 });

@@ -1,11 +1,19 @@
 /*
  * Vesktop, a desktop app aiming to give you a snappier Discord Experience
+<<<<<<< HEAD
  * Copyright (c) 2025 Vendicated and Vesktop contributors
+=======
+ * Copyright (c) 2024 Vendicated and Vencord contributors
+>>>>>>> upstream/main
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
 import { spawnSync } from "node:child_process";
+<<<<<<< HEAD
 import { closeSync, constants, existsSync, open, openSync, unlinkSync, writeFileSync } from "node:fs";
+=======
+import { constants, existsSync, open, unlinkSync } from "node:fs";
+>>>>>>> upstream/main
 import { join } from "node:path";
 
 import { Socket } from "net";
@@ -14,8 +22,12 @@ import { IpcEvents } from "shared/IpcEvents";
 import { mainWin } from "./mainWindow";
 
 const xdgRuntimeDir = process.env.XDG_RUNTIME_DIR || process.env.TMP || "/tmp";
+<<<<<<< HEAD
 export const socketFile = join(xdgRuntimeDir, "vesktop-ipc");
 const LOCK_FILE = join(xdgRuntimeDir, "vesktop-ipc.lock");
+=======
+const socketFile = join(xdgRuntimeDir, "vesktop-ipc");
+>>>>>>> upstream/main
 
 const Actions = new Set([IpcEvents.TOGGLE_SELF_DEAF, IpcEvents.TOGGLE_SELF_MUTE]);
 
@@ -66,6 +78,7 @@ function openFIFO() {
 
 function cleanup() {
     try {
+<<<<<<< HEAD
         if (existsSync(socketFile)) {
             unlinkSync(socketFile);
         }
@@ -104,4 +117,16 @@ export function initKeybinds() {
             console.error("Failed to remove lock file:", err);
         }
     });
+=======
+        unlinkSync(socketFile);
+    } catch (err) {}
+}
+
+process.on("exit", cleanup);
+
+export function initKeybinds() {
+    if (createFIFO()) {
+        openFIFO();
+    }
+>>>>>>> upstream/main
 }

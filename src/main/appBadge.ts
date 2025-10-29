@@ -4,13 +4,19 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-import { app, NativeImage, nativeImage } from "electron";
+import { app, type NativeImage, nativeImage } from "electron";
 import { join } from "path";
 import { IpcEvents } from "shared/IpcEvents";
 import { BADGE_DIR } from "shared/paths";
 
+<<<<<<< HEAD
 import { mainWin } from "./mainWindow";
 import { dbus, getSessionBus } from "./utils/dbus";
+=======
+import { updateUnityLauncherCount } from "./dbus";
+import { AppEvents } from "./events";
+import { mainWin } from "./mainWindow";
+>>>>>>> upstream/main
 
 const imgCache = new Map<number, NativeImage>();
 function loadBadge(index: number) {
@@ -23,10 +29,24 @@ function loadBadge(index: number) {
     return img;
 }
 
+<<<<<<< HEAD
 let lastBadgeIndex: null | number = -1;
 export var lastBadgeCount: number = -1;
+=======
+let lastIndex: null | number = -1;
+let isInVoiceCall = false;
+>>>>>>> upstream/main
 
+AppEvents.on("voiceCallStateChanged", (inCall: boolean) => {
+    isInVoiceCall = inCall;
+});
+
+/**
+ * -1 = show unread indicator
+ * 0 = clear
+ */
 export function setBadgeCount(count: number) {
+<<<<<<< HEAD
     lastBadgeCount = count;
     switch (process.platform) {
         case "linux":
@@ -53,6 +73,16 @@ export function setBadgeCount(count: number) {
                     ]
                 ]
             });
+=======
+    if (!isInVoiceCall) {
+        AppEvents.emit("setTrayVariant", count !== 0 ? "trayUnread" : "tray");
+    }
+
+    switch (process.platform) {
+        case "linux":
+            // if (count === -1) count = 0;
+            updateUnityLauncherCount(count);
+>>>>>>> upstream/main
             break;
         case "darwin":
             if (count === 0) {
@@ -61,16 +91,15 @@ export function setBadgeCount(count: number) {
             }
             app.dock!.setBadge(count === -1 ? "•" : count.toString());
             break;
-        case "win32":
+        case "win32": {
             const [index, description] = getBadgeIndexAndDescription(count);
             if (lastBadgeIndex === index) break;
 
             lastBadgeIndex = index;
 
-            // circular import shenanigans
-            const { mainWin } = require("./mainWindow") as typeof import("./mainWindow");
             mainWin.setOverlayIcon(index === null ? null : loadBadge(index), description);
             break;
+        }
     }
 
     mainWin.webContents.send(IpcEvents.SET_CURRENT_VOICE_TRAY_ICON);

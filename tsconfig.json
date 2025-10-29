@@ -10,12 +10,13 @@
         "target": "ESNEXT",
         "jsx": "preserve",
 
-        // we have duplicate electron types but it's w/e
+        // @vencord/types has some errors for now
         "skipLibCheck": true,
 
         "baseUrl": "./src/",
 
         "typeRoots": ["./node_modules/@types", "./node_modules/@vencord"]
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist", "src/main/arrpc/bunWorker.ts"]
 }

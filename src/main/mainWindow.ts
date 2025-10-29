@@ -4,29 +4,37 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+import { join } from "node:path";
+
 import {
     app,
     BrowserWindow,
-    BrowserWindowConstructorOptions,
-    dialog,
+    type BrowserWindowConstructorOptions,
     Menu,
-    MenuItemConstructorOptions,
+    type MenuItemConstructorOptions,
     nativeTheme,
+    type Rectangle,
     screen,
+<<<<<<< HEAD
     session,
     systemPreferences,
     Tray
+=======
+    session
+>>>>>>> upstream/main
 } from "electron";
-import { EventEmitter } from "events";
-import { rm } from "fs/promises";
-import { join } from "path";
 import { IpcCommands, IpcEvents } from "shared/IpcEvents";
+<<<<<<< HEAD
 import { ICON_PATH } from "shared/paths";
+=======
+import { STATIC_DIR } from "shared/paths";
+>>>>>>> upstream/main
 import { isTruthy } from "shared/utils/guards";
 import { once } from "shared/utils/once";
 import type { SettingsStore } from "shared/utils/SettingsStore";
 
 import { createAboutWindow } from "./about";
+<<<<<<< HEAD
 import { initArRPC } from "./arrpc";
 import {
     BrowserUserAgent,
@@ -38,10 +46,17 @@ import {
     MIN_WIDTH,
     VENCORD_DIR
 } from "./constants";
+=======
+import { destroyArRPC, initArRPC } from "./arrpc";
+import { CommandLine } from "./cli";
+import { BrowserUserAgent, DEFAULT_HEIGHT, DEFAULT_WIDTH, isLinux, MIN_HEIGHT, MIN_WIDTH } from "./constants";
+import { AppEvents } from "./events";
+>>>>>>> upstream/main
 import { darwinURL } from "./index";
 import { sendRendererCommand } from "./ipcCommands";
 import { initKeybinds } from "./keybinds";
 import { Settings, State, VencordSettings } from "./settings";
+<<<<<<< HEAD
 import { addSplashLog, splash, updateSplashMessage } from "./splash";
 import { setTrayIcon } from "./tray";
 import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
@@ -50,11 +65,23 @@ import { downloadVencordAsar, ensureVencordFiles } from "./utils/vencordLoader";
 
 let isQuitting = false;
 export let tray: Tray;
+=======
+import { addSplashLog, createSplashWindow, updateSplashMessage } from "./splash";
+import { destroyTray, initTray } from "./tray";
+import { clearData } from "./utils/clearData";
+import { makeLinksOpenExternally } from "./utils/makeLinksOpenExternally";
+import { applyDeckKeyboardFix, askToApplySteamLayout, isDeckGameMode } from "./utils/steamOS";
+import { downloadVencordAsar, ensureVencordFiles } from "./utils/vencordLoader";
+import { VENCORD_DIR } from "./vencordDir";
+
+let isQuitting = false;
+>>>>>>> upstream/main
 
 applyDeckKeyboardFix();
 
 app.on("before-quit", () => {
     isQuitting = true;
+    destroyArRPC();
 });
 
 export let mainWin: BrowserWindow;
@@ -80,6 +107,7 @@ function makeSettingsListenerHelpers<O extends object>(o: SettingsStore<O>) {
 const [addSettingsListener, removeSettingsListeners] = makeSettingsListenerHelpers(Settings);
 const [addVencordSettingsListener, removeVencordSettingsListeners] = makeSettingsListenerHelpers(VencordSettings);
 
+<<<<<<< HEAD
 function initTray(win: BrowserWindow) {
     const onTrayClick = () => {
         if (Settings.store.clickTrayToShowHide && win.isVisible()) win.hide();
@@ -159,6 +187,8 @@ async function clearData(win: BrowserWindow) {
     app.quit();
 }
 
+=======
+>>>>>>> upstream/main
 type MenuItemList = Array<MenuItemConstructorOptions | false>;
 
 function initMenuBar(win: BrowserWindow) {
@@ -267,55 +297,6 @@ function initMenuBar(win: BrowserWindow) {
     Menu.setApplicationMenu(menu);
 }
 
-function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
-    // We want the default window behaivour to apply in game mode since it expects everything to be fullscreen and maximized.
-    if (isDeckGameMode) return {};
-
-    const { x, y, width, height } = State.store.windowBounds ?? {};
-
-    const options = {
-        width: width ?? DEFAULT_WIDTH,
-        height: height ?? DEFAULT_HEIGHT
-    } as BrowserWindowConstructorOptions;
-
-    const storedDisplay = screen.getAllDisplays().find(display => display.id === State.store.displayId);
-
-    if (x != null && y != null && storedDisplay) {
-        options.x = x;
-        options.y = y;
-    }
-
-    if (!Settings.store.disableMinSize) {
-        options.minWidth = MIN_WIDTH;
-        options.minHeight = MIN_HEIGHT;
-    }
-
-    return options;
-}
-
-function getDarwinOptions(): BrowserWindowConstructorOptions {
-    const options = {
-        titleBarStyle: "hidden",
-        trafficLightPosition: { x: 10, y: 10 }
-    } as BrowserWindowConstructorOptions;
-
-    const { splashTheming, splashBackground } = Settings.store;
-    const { macosTranslucency } = VencordSettings.store;
-
-    if (macosTranslucency) {
-        options.vibrancy = "sidebar";
-        options.backgroundColor = "#ffffff00";
-    } else {
-        if (splashTheming !== false) {
-            options.backgroundColor = splashBackground;
-        } else {
-            options.backgroundColor = nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
-        }
-    }
-
-    return options;
-}
-
 function initWindowBoundsListeners(win: BrowserWindow) {
     const saveState = () => {
         State.store.maximized = win.isMaximized();
@@ -328,7 +309,6 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
     const saveBounds = () => {
         State.store.windowBounds = win.getBounds();
-        State.store.displayId = screen.getDisplayMatching(State.store.windowBounds).id;
     };
 
     win.on("resize", saveBounds);
@@ -337,8 +317,8 @@ function initWindowBoundsListeners(win: BrowserWindow) {
 
 function initSettingsListeners(win: BrowserWindow) {
     addSettingsListener("tray", enable => {
-        if (enable) initTray(win);
-        else tray?.destroy();
+        if (enable) initTray(win, q => (isQuitting = q));
+        else destroyTray();
     });
 
     addSettingsListener("disableMinSize", disable => {
@@ -373,7 +353,7 @@ function initSettingsListeners(win: BrowserWindow) {
     addSettingsListener("spellCheckLanguages", languages => initSpellCheckLanguages(win, languages));
 }
 
-async function initSpellCheckLanguages(win: BrowserWindow, languages?: string[]) {
+async function initSpellCheckLanguages(_win: BrowserWindow, languages?: string[]) {
     languages ??= await sendRendererCommand(IpcCommands.GET_LANGUAGES);
     if (!languages) return;
 
@@ -416,40 +396,87 @@ function initStaticTitle(win: BrowserWindow) {
     });
 }
 
+<<<<<<< HEAD
 function createMainWindow() {
     addSplashLog();
 
     // Clear up previous settings listeners
     removeSettingsListeners();
     removeVencordSettingsListeners();
+=======
+function getWindowBoundsOptions(): BrowserWindowConstructorOptions {
+    addSplashLog();
+
+    // We want the default window behaviour to apply in game mode since it expects everything to be fullscreen and maximized.
+    if (isDeckGameMode) return {};
+
+    const { x, y, width = DEFAULT_WIDTH, height = DEFAULT_HEIGHT } = State.store.windowBounds ?? {};
+
+    const options = { width, height } as BrowserWindowConstructorOptions;
+
+    if (x != null && y != null) {
+        function isInBounds(rect: Rectangle, display: Rectangle) {
+            return !(
+                rect.x + rect.width < display.x ||
+                rect.x > display.x + display.width ||
+                rect.y + rect.height < display.y ||
+                rect.y > display.y + display.height
+            );
+        }
+
+        const inBounds = screen.getAllDisplays().some(d => isInBounds({ x, y, width, height }, d.bounds));
+        if (inBounds) {
+            options.x = x;
+            options.y = y;
+        }
+    }
+
+    if (!Settings.store.disableMinSize) {
+        options.minWidth = MIN_WIDTH;
+        options.minHeight = MIN_HEIGHT;
+    }
+
+    return options;
+}
+
+function buildBrowserWindowOptions(): BrowserWindowConstructorOptions {
+    addSplashLog();
+>>>>>>> upstream/main
 
     addSplashLog();
 
     const { staticTitle, transparencyOption, enableMenu, customTitleBar, splashTheming, splashBackground } =
         Settings.store;
 
-    const { frameless, transparent } = VencordSettings.store;
+    const { frameless, transparent, macosTranslucency } = VencordSettings.store;
 
     const noFrame = frameless === true || customTitleBar === true;
     const backgroundColor =
         splashTheming !== false ? splashBackground : nativeTheme.shouldUseDarkColors ? "#313338" : "#ffffff";
 
-    const win = (mainWin = new BrowserWindow({
+    const options: BrowserWindowConstructorOptions = {
         show: Settings.store.enableSplashScreen === false,
         backgroundColor,
+        ...(process.platform === "win32" && { icon: join(STATIC_DIR, "icon.ico") }),
         webPreferences: {
             nodeIntegration: false,
-            sandbox: false,
+            sandbox: false, // TODO
             contextIsolation: true,
             devTools: true,
             preload: join(__dirname, "preload.js"),
             spellcheck: true,
+<<<<<<< HEAD
             ...(Settings.store.middleClickAutoscroll && { enableBlinkFeatures: "MiddleClickAutoscroll" }),
+=======
+            ...(Settings.store.middleClickAutoscroll && {
+                enableBlinkFeatures: "MiddleClickAutoscroll"
+            }),
+>>>>>>> upstream/main
             // disable renderer backgrounding to prevent the app from unloading when in the background
             backgroundThrottling: false
         },
-        icon: ICON_PATH,
         frame: !noFrame,
+<<<<<<< HEAD
         ...(transparent && {
             transparent: true,
             backgroundColor: "#00000000"
@@ -470,11 +497,59 @@ function createMainWindow() {
         ...getWindowBoundsOptions(),
         autoHideMenuBar: enableMenu
     }));
+=======
+        autoHideMenuBar: enableMenu,
+        ...getWindowBoundsOptions()
+    };
+
+    if (transparent) {
+        options.transparent = true;
+        options.backgroundColor = "#00000000";
+    }
+
+    if (transparencyOption && transparencyOption !== "none") {
+        options.backgroundColor = "#00000000";
+        options.backgroundMaterial = transparencyOption;
+
+        if (customTitleBar) {
+            options.transparent = true;
+        }
+    }
+
+    if (staticTitle) {
+        options.title = "Equibop";
+    }
+
+    if (process.platform === "darwin") {
+        options.titleBarStyle = "hidden";
+        options.trafficLightPosition = { x: 10, y: 10 };
+
+        if (macosTranslucency) {
+            options.vibrancy = "sidebar";
+            options.backgroundColor = "#ffffff00";
+        }
+    }
+
+    return options;
+}
+
+function createMainWindow() {
+    // Clear up previous settings listeners
+    removeSettingsListeners();
+    removeVencordSettingsListeners();
+
+    const win = (mainWin = new BrowserWindow(buildBrowserWindowOptions()));
+
+>>>>>>> upstream/main
     win.setMenuBarVisibility(false);
 
     addSplashLog();
 
+<<<<<<< HEAD
     if (process.platform === "darwin" && customTitleBar) win.setWindowButtonVisibility(false);
+=======
+    if (process.platform === "darwin" && Settings.store.customTitleBar) win.setWindowButtonVisibility(false);
+>>>>>>> upstream/main
 
     win.on("close", e => {
         const useTray = !isDeckGameMode && Settings.store.minimizeToTray !== false && Settings.store.tray !== false;
@@ -497,7 +572,9 @@ function createMainWindow() {
     addSplashLog();
 
     initWindowBoundsListeners(win);
-    if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin") initTray(win);
+    if (!isDeckGameMode && (Settings.store.tray ?? true) && process.platform !== "darwin")
+        initTray(win, q => (isQuitting = q));
+
     initMenuBar(win);
     makeLinksOpenExternally(win);
     initSettingsListeners(win);
@@ -513,13 +590,20 @@ function createMainWindow() {
     // if the open-url event is fired (in index.ts) while starting up, darwinURL will be set. If not fall back to checking the process args (which Windows and Linux use for URI calling.)
     loadUrl(darwinURL || process.argv.find(arg => arg.startsWith("discord://")));
     addSplashLog();
+<<<<<<< HEAD
+=======
+    // });
+>>>>>>> upstream/main
 
     return win;
 }
 
 const runVencordMain = once(() => require(VENCORD_DIR));
+<<<<<<< HEAD
 
 const loadEvents = new EventEmitter();
+=======
+>>>>>>> upstream/main
 
 export function loadUrl(uri: string | undefined) {
     const branch = Settings.store.discordBranch;
@@ -528,7 +612,7 @@ export function loadUrl(uri: string | undefined) {
     // we do not rely on 'did-finish-load' because it fires even if loadURL fails which triggers early detruction of the splash
     mainWin
         .loadURL(`https://${subdomain}discord.com/${uri ? new URL(uri).pathname.slice(1) || "app" : "app"}`)
-        .then(() => loadEvents.emit("app-loaded"))
+        .then(() => AppEvents.emit("appLoaded"))
         .catch(error => retryUrl(error.url, error.code));
 }
 
@@ -540,9 +624,14 @@ function retryUrl(url: string, description: string) {
 }
 
 export async function createWindows() {
-    const startMinimized = process.argv.includes("--start-minimized");
+    const startMinimized = CommandLine.values["start-minimized"];
 
     if (Settings.store.enableSplashScreen !== false) {
+<<<<<<< HEAD
+=======
+        splash = await createSplashWindow(startMinimized);
+
+>>>>>>> upstream/main
         // SteamOS letterboxes and scales it terribly, so just full screen it
         if (isDeckGameMode) splash.setFullScreen(true);
         addSplashLog();
@@ -555,24 +644,29 @@ export async function createWindows() {
     addSplashLog();
     mainWin = createMainWindow();
 
-    loadEvents.on("app-loaded", () => {
+    AppEvents.on("appLoaded", () => {
         splash?.destroy();
 
         if (!startMinimized) {
+<<<<<<< HEAD
             mainWin!.show();
             if (State.store.maximized && !isDeckGameMode) mainWin!.maximize();
+=======
+            if (splash) mainWin?.show();
+            if (State.store.maximized && !isDeckGameMode) mainWin?.maximize();
+>>>>>>> upstream/main
         }
 
         if (isDeckGameMode) {
             // always use entire display
-            mainWin!.setFullScreen(true);
+            mainWin?.setFullScreen(true);
 
             askToApplySteamLayout(mainWin);
         }
 
         mainWin.once("show", () => {
-            if (State.store.maximized && !mainWin!.isMaximized() && !isDeckGameMode) {
-                mainWin!.maximize();
+            if (State.store.maximized && !mainWin?.isMaximized() && !isDeckGameMode) {
+                mainWin?.maximize();
             }
         });
 
@@ -594,9 +688,13 @@ export async function createWindows() {
     });
 
     initArRPC();
+<<<<<<< HEAD
     initKeybinds();
 }
 
 export function getAccentColor(): Promise<string> {
     return Promise.resolve(`#${systemPreferences.getAccentColor?.() || ""}`);
+=======
+    if (isLinux) initKeybinds();
+>>>>>>> upstream/main
 }

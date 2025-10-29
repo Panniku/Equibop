@@ -23,6 +23,7 @@ export type NavigatorUAData = {
     mobile: boolean;
 };
 
+<<<<<<< HEAD
 export interface NavigatorExtended extends Navigator {
     userAgentData?: NavigatorUAData;
 }
@@ -88,3 +89,8 @@ export function waitForComponent<T extends React.ComponentType<any> = React.Comp
 
     return lazyComponent;
 }
+=======
+export const isWindows = platform.startsWith("Win");
+export const isMac = platform.startsWith("Mac");
+export const isLinux = platform.startsWith("Linux");
+>>>>>>> upstream/main

@@ -4,8 +4,14 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+<<<<<<< HEAD
 import { Margins, Modals, ModalSize, openModal } from "@vencord/types/utils";
 import { Button, Forms, TextInput } from "@vencord/types/webpack/common";
+=======
+import { Divider } from "@equicord/types/components";
+import { Margins, Modals, ModalSize, openModal } from "@equicord/types/utils";
+import { Button, Forms, TextInput } from "@equicord/types/webpack/common";
+>>>>>>> upstream/main
 import { useSettings } from "renderer/settings";
 
 import { SettingsComponent } from "./Settings";
@@ -48,6 +54,7 @@ export const Arguments: SettingsComponent = ({ settings }) => {
     };
 
     return (
+<<<<<<< HEAD
         <Forms.FormSection>
             <div className="vcd-tray-settings">
                 <div className="vcd-tray-container">
@@ -60,5 +67,17 @@ export const Arguments: SettingsComponent = ({ settings }) => {
                 <Forms.FormDivider className={Margins.top20 + " " + Margins.bottom20} />
             </div>
         </Forms.FormSection>
+=======
+        <div className="vcd-tray-settings">
+            <div className="vcd-tray-container">
+                <div className="vcd-tray-settings-labels">
+                    <Forms.FormTitle tag="h3">Arguments</Forms.FormTitle>
+                    <Forms.FormText>Enter arguments to pass to Discord</Forms.FormText>
+                </div>
+                <Button onClick={openTextModal}>Configure</Button>
+            </div>
+            <Divider className={Margins.top20 + " " + Margins.bottom20} />
+        </div>
+>>>>>>> upstream/main
     );
 };
